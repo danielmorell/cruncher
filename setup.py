@@ -26,7 +26,7 @@ setup(
     url='https://github.com/danmorell/Image-Cruncher',
     author='Daniel Morell',
     author_email='daniel@carintek.com',
-    description="Simple image compressor to optimize for web ready images.",
+    description="Simple CLI to optimize images for the web.",
     long_description=readme,
     long_description_content_type="text/markdown",
     py_modules=['image_cruncher'],

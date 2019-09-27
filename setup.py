@@ -23,6 +23,7 @@ setup(
     name='image_cruncher',
     version='0.0.1',
     license='GPLv3+',
+    url='https://github.com/danmorell/Image-Cruncher',
     author='Daniel Morell',
     author_email='daniel@carintek.com',
     description="Simple image compressor to optimize for web ready images.",

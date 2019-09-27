@@ -58,7 +58,7 @@ from .resize import resize
     help='The pixel width / height of the image after it is crunched. [Format: -S <WIDTH HEIGHT>]'
 )
 @click.option(
-    '-A', '--append-filename', 'append',
+    '-A', '--append', 'append',
     type=str,
     default=None,
     help='Append a string to the filename.'
@@ -79,7 +79,8 @@ from .resize import resize
     default=1,
     show_default=True,
     help='The number of versions to create for each image. If this is set to more '
-         'than one you will be prompted to enter --quality, --size,'
+         'than one you will be prompted to enter --format, --quality, --size, '
+         '--append, --ignore-orientation, and --keep-metadata.'
 )
 @click.option(
     '-C', '--config', 'config',

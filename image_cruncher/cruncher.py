@@ -8,50 +8,46 @@
 """
 # Standard Library Imports
 import os
-import json
 
 # Package Imports
-import click
 from PIL import Image
+import click
 
 # Local Imports
 
 
 class CruncherBase:
 
-    def __init__(self, image, directory, output, image_path, version):
-        self.image = image
-        self.directory = directory
+    def __init__(self, mode, path, output, image_path, version):
+        self.mode = mode
+        self.path = path
         self.output = output
         self.image_path = image_path
         self.version = version
-        directory, filename = os.path.split(image_path)
-        self.filename = self.generate_filename(filename, version)
-        self.new_path = self.image_output_path(os.path.join(directory, filename))
+        self.filename = self.generate_filename(os.path.split(image_path)[1], version)
+        self.new_path = self.image_output_path(image_path)
+        self.exif = b''
 
-        self.crunch_image(image_path, version)
+        self.crunch_image()
 
     def image_output_path(self, image_path):
-        # TODO write proper single image path calculation
+        """
+        Calculate the output path for the image.
+
+        :param image_path: Image input path.
+        :return: Image output path.
+        """
         if self.mode == 'img':
-            return image_path
-        relative_path = os.path.relpath(image_path, self.directory)
-        path = os.path.join(self.output, relative_path)
-        return path
+            image_name = os.path.split(image_path)[1]
+            return os.path.join(self.output, image_name)
+        relative_path = os.path.relpath(image_path, self.path)
+        return os.path.join(self.output, relative_path)
 
-    def crunch_image(self, path, version):
-        image = Image.open(path)
-        directory, filename = os.path.split(path)
-        filename = self.generate_filename(filename, version)
-        new_path = self.image_output_path(os.path.join(directory, filename))
-        exif = None
-        if version['keep_metadata']:
-            print(image.info)
-            exif = image.info['exif']
-        full = self.resize(image, (version['width'], version['height']), version)
-        full.save(new_path, "JPEG", quality=version['quality'], optimize=True, progressive=True, exif=exif)
+    def crunch_image(self):
+        pass
 
-    def generate_filename(self, filename, version):
+    @staticmethod
+    def generate_filename(filename, version):
         return f"{filename}{version['append']}.{version['file_format']}"
 
     @staticmethod
@@ -73,11 +69,10 @@ class CruncherBase:
         old_aspect = image.width / image.height
         new_aspect = size[0] / size[1]
 
-        if version['orientation']:
+        if version['orientation'] and (old_aspect < 0 <= new_aspect or old_aspect >= 0 > new_aspect):
             # if one is horizontal and the other vertical flip the orientation
-            if old_aspect < 0 <= new_aspect or old_aspect >= 0 > new_aspect:
-                size = (size[1], size[0])
-                new_aspect = size[0] / size[1]
+            size = (size[1], size[0])
+            new_aspect = size[0] / size[1]
 
         if size == (image.width, image.height):
             return image
@@ -98,18 +93,117 @@ class CruncherBase:
 
         return cropped
 
+    def calculate_sampling(self, options, base):
+        divisor = (100 - base) / len(options)
+        raw_sampling = ((self.version['quality'] - base) / divisor) - 1
+        if raw_sampling < 0:
+            return 0
+        return round(raw_sampling)
+
+
+class GIFCruncher(CruncherBase):
+
+    def __init__(self, mode, path, output, image_path, version):
+        super().__init__(mode, path, output, image_path, version)
+
+    def crunch_image(self):
+        image = Image.open(self.path)
+        if self.version['metadata'] and image.info.get('exif'):
+            self.exif = image.info.get('exif')
+        transparency = None
+        if image.info.get('transparency'):
+            transparency = image.info.get('transparency')
+        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        image.save(
+            self.new_path,
+            "GIF",
+            optimize=True,
+            transparency=transparency
+        )
+
 
 class JPEGCruncher(CruncherBase):
+    """
+    Quality Based Sampling
+        0 - 70: 4:2:0
+        71 - 89: 4:2:2
+        90 - 100: 4:4:4
+    """
 
-    def __init__(self, image, directory, output, image_path, version):
-        super().__init__(image, directory, output, image_path, version)
+    def __init__(self, mode, path, output, image_path, version):
+        super().__init__(mode, path, output, image_path, version)
 
-    def crunch_image(self, path, version):
-        image = Image.open(path)
-        exif = None
-        if version['keep_metadata']:
-            print(image.info)
-            exif = image.info['exif']
-        image = self.resize(image, (version['width'], version['height']), version)
-        image.save(new_path, "JPEG", quality=version['quality'], optimize=True, progressive=True, exif=exif)
+    def crunch_image(self):
+        image = Image.open(self.path)
+        if self.version['metadata'] and image.info.get('exif'):
+            self.exif = image.info.get('exif')
+        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        sampling = self.calculate_sampling([0, 1, 2], 40)
+        click.echo(sampling)
+        image.save(
+            self.new_path,
+            "JPEG",
+            quality=self.version['quality'],
+            sampling=sampling,
+            optimize=True,
+            progressive=True,
+            exif=self.exif
+        )
 
+
+class JPEG2000Cruncher(CruncherBase):
+
+    def __init__(self, mode, path, output, image_path, version):
+        super().__init__(mode, path, output, image_path, version)
+
+    def crunch_image(self):
+        image = Image.open(self.path)
+        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        image.save(
+            self.new_path,
+            "JPEG",
+            quality_mode='dB',
+            quality_layers=self.version['quality'],
+            progressive=True
+        )
+
+
+class PNGCruncher(CruncherBase):
+
+    def __init__(self, mode, path, output, image_path, version):
+        super().__init__(mode, path, output, image_path, version)
+
+    def crunch_image(self):
+        image = Image.open(self.path)
+        if self.version['metadata'] and image.info.get('exif'):
+            self.exif = image.info.get('exif')
+        transparency = None
+        if image.info.get('transparency'):
+            transparency = image.info.get('transparency')
+        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        image.save(
+            self.new_path,
+            "PNG",
+            optimize=True,
+            exif=self.exif,
+            transparency=transparency
+        )
+
+
+class WebPCruncher(CruncherBase):
+
+    def __init__(self, mode, path, output, image_path, version):
+        super().__init__(mode, path, output, image_path, version)
+
+    def crunch_image(self):
+        image = Image.open(self.path)
+        if self.version['metadata'] and image.info.get('exif'):
+            self.exif = image.info.get('exif')
+        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        image.save(
+            self.new_path,
+            "WebP",
+            quality=(100 - self.version['quality']),
+            method=0,
+            exif=self.exif
+        )

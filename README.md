@@ -246,18 +246,18 @@ $ image_cruncher -d "C:\other_image_dir\" -c "C:\path_to_config\config.json"
 #### Path does not exist
 
 ```
-$ image_cruncher -F C:\Projects\Image Dir\image.png -S 1000 600
+$ image_cruncher -i C:\Projects\Image Dir\image.png -S 1000 600
 
-Error: Invalid value for "-F" / "--file": Path "C:\Projects\Image" does not exist.
+Error: Invalid value for "-i" / "--file": Path "C:\Projects\Image" does not exist.
 ```
 
 This error is cause because there is a blank space in the path to correct this wrap the path in double quotes.
 
 ```
-$ image_cruncher -F "C:\Projects\Image Dir\image.png" -S 1000 600
+$ image_cruncher -i "C:\Projects\Image Dir\image.png" -S 1000 600
 ```
 
-This applies to `--directory`, `--file`, and `--output` options.
+This applies to `--directory`, `--image`, `--output`, and `--config` options.
 
 ## Contributors
 

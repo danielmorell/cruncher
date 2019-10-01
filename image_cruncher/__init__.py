@@ -20,14 +20,14 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS
 @click.option(
     '-i', '--image', 'image',
     type=click.Path(exists=True, readable=True, file_okay=True),
-    help='The path of the image to crunch.'
+    help='The absolute path to the image to be crunched.'
 )
 @click.option(
     '-d', '--directory', 'directory',
     type=click.Path(exists=True, readable=True, dir_okay=True),
     default=os.getcwd(),
     show_default='current directory',
-    help='The path of directory of images to crunch.'
+    help='The absolute path to the directory of images to be crunched.'
 )
 @click.option(
     '-o', '--output', 'output',
@@ -41,7 +41,7 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS
     type=click.Choice(OUTPUT_FILE_FORMATS, case_sensitive=False),
     default='JPEG',
     show_default=True,
-    help='The output image file_format of the final crunched image.'
+    help='The output image format of the final crunched image.'
 )
 @click.option(
     '-q', '--quality', 'quality',
@@ -74,11 +74,11 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS
     help='Include this flag to keep the image meta/exif. It is removed by default.'
 )
 @click.option(
-    '-c', '--versions', 'nversions',
+    '-v', '--versions', 'nversions',
     default=1,
     show_default=True,
     help='The number of versions to create for each image. If this is set to more '
-         'than one you will be prompted to enter --file_format, --quality, --size, '
+         'than one you will be prompted to enter --format, --quality, --size, '
          '--append, --ignore-orientation, and --keep-metadata.'
 )
 @click.option(

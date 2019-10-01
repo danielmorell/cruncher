@@ -17,22 +17,21 @@ $ pip install <pypi name here>
 
 ### Options
 
-```
-  -i, --image PATH                The path of the image to crunch.
-  -d, --directory PATH            The path of directory of images to crunch. [default: (current directory)]
-  -o, --output PATH               The the directory to place the crunched images in.
-  -f, --format [JPEG|JPEG 2000|WebP|GIF|PNG]
-                                  The output image file_format of the final runched image.  [default: JPEG]
-  -q, --quality INTEGER RANGE     The quality of the image after it is crunched. [range: 1 - 100]  [default: 80]
-  -s, --size <INTEGER INTEGER>    The pixel width / height of the image after it is crunched. [Format: -S <WIDTH HEIGHT>]
-  -a, --append TEXT               Append a string to the filename.
-  --ignore-orientation            Include this flag to ignore the original image orientation. I.e. if --size is landscape all portrait images will be cropped as landscape.
-  -m, --keep-metadata             Include this flag to keep the image meta/exif. It is removed by default.
-  -c, --versions INTEGER          The number of versions to create for each image. If this is set to more than one you will be prompted to enter --file_format, --quality, --size, --append, --ignore-orientation, and --keep-metadata.  [default: 1]
-  -r, --recursive                 Get images from sub directories also. Only applicable if --directory is used.
-  -c, --config PATH               Specify a JSON file with your settings, this will override all other settings.
-  --help                          Show the help message and exit.
-```
+Option         | Argument            | Information | Default
+---------------|---------------------|-------------|--------
+Image path         | `-i`, `--image`         | The absolute path to the image to be crunched. | None
+Directory path     | `-d`, `--directory`     | The absolute path to the directory of images to be crunched. | The current working directory
+Output path        | `-o`, `--output`        | The absolute path to the directory where crunched images will be placed. | The current working directory `/crunched`
+Format             | `-f`, `--format`        | The output image format of the final crunched image. Options are `GIF`, `JPEG`, `JPEG 2000`, `PNG`, and `WebP`.  | `JPEG`
+Quality            | `-q`, `--quality`       | The quality of the image after it is crunched. May be any integer between `1` and `100`. | `80`
+Size               | `-s`, `--size`          | The pixel `width height` of the image after it is crunched. This should be two integers with a space between. If none is set, the original image size is used. | None
+Append Filename    | `-a`, `--append`        | Append a string to the image filename. | None
+Ignore Orientation | `--ignore-orientation`  | Include this flag to ignore the original image orientation. I.e. if `--size` is landscape all portrait images will be cropped as landscape. | `False`
+Keep Metadata      | `-m`, `--keep-metadata` | Include this flag to keep the image meta/exif. | Metadata is removed by default.
+Number of Versions | `-v`, `--versions`      | The number of versions to create for each image. If this is set to more than `1` you will be prompted to enter `--format`, `--quality`, `--size`, `--append`, `--ignore-orientation`, and `--keep-metadata` for each version. | `1`
+Recursive Mode     | `-r`, `--recursive`     | Get images from sub directories also. Only applicable if `--directory` is used. | `False`
+Config File        | `-c`, `--config`        | Specify the absolute path to a JSON file with your settings. JSON configs will override command line configs if set. | None
+Help               | `--help`                | Show the help message and exit. |
 
 ## Troubleshooting
 

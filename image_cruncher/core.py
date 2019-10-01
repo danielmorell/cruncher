@@ -64,13 +64,14 @@ class CrunchHandler:
 
     def generate_versions(self):
         if self.nversions > 1 and self.config is None:
-            click.echo('-- Multi versions')
+            click.echo('Please enter the needed information for each version.')
             i = 1
             while i <= self.nversions:
+                click.echo(f'Version {i}'),
                 size = self.parse_size(click.prompt(f'Size WIDTH HEIGHT', type=str))
                 self.versions.append({
-                    'version': click.echo(f'Version {i}'),
-                    'file_format': click.prompt(f'File format', type=click.Choice(['jpg', 'webp', 'gif', 'png']),
+                    'version': i,
+                    'file_format': click.prompt(f'File format', type=click.Choice(OUTPUT_FILE_FORMATS),
                                                 show_choices=False),
                     'width': size[0],
                     'height': size[1],

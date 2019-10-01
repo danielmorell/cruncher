@@ -13,8 +13,7 @@ import os
 import click
 
 # Local Imports
-from .core import ImageCruncher
-from .resize import resize
+from .core import CrunchHandler, OUTPUT_FILE_FORMATS
 
 
 @click.command()
@@ -38,11 +37,11 @@ from .resize import resize
     help='The the directory to place the crunched images in.'
 )
 @click.option(
-    '-F', '--format', 'format',
-    type=click.Choice(['jpg', 'webp', 'gif', 'png'], case_sensitive=False),
-    default='jpg',
+    '-F', '--format', 'file_format',
+    type=click.Choice(OUTPUT_FILE_FORMATS, case_sensitive=False),
+    default='JPEG',
     show_default=True,
-    help='The output image format of the final crunched image.'
+    help='The output image file_format of the final crunched image.'
 )
 @click.option(
     '-Q', '--quality', 'quality',
@@ -75,12 +74,18 @@ from .resize import resize
     help='Include this flag to keep the image meta/exif. It is removed by default.'
 )
 @click.option(
-    '-V', '--versions', 'versions',
+    '-V', '--versions', 'nversions',
     default=1,
     show_default=True,
     help='The number of versions to create for each image. If this is set to more '
-         'than one you will be prompted to enter --format, --quality, --size, '
+         'than one you will be prompted to enter --file_format, --quality, --size, '
          '--append, --ignore-orientation, and --keep-metadata.'
+)
+@click.option(
+    '-R', '--recursive', 'recursive',
+    is_flag=True,
+    help='Get images from sub directories also. Only applicable if --directory '
+         'is used.'
 )
 @click.option(
     '-C', '--config', 'config',
@@ -88,7 +93,7 @@ from .resize import resize
     default=None,
     help='Specify a JSON file with your settings, this will override all other settings.'
 )
-def cli(image, directory, output, format, quality, size, append, metadata, orientation, versions, config):
+def cli(image, directory, output, file_format, quality, size, append, metadata, orientation, nversions, recursive, config):
     """
     Image Cruncher
 
@@ -97,33 +102,37 @@ def cli(image, directory, output, format, quality, size, append, metadata, orien
     the specified size and quality.
     """
 
-    click.echo('Image:       ' + str(image))
-    click.echo('Directory:   ' + str(directory))
-    click.echo('Output:      ' + str(output))
-    click.echo('format:      ' + str(format))
-    click.echo('Quality:     ' + str(quality))
-    click.echo('Size:        ' + str(size))
-    click.echo('Append:      ' + str(append))
-    click.echo('Metadata:    ' + str(metadata))
-    click.echo('orientation: ' + str(orientation))
-    click.echo('Versions:    ' + str(versions))
-    click.echo('Config:      ' + str(config))
+    # click.echo('Image:        ' + str(image))
+    # click.echo('Directory:    ' + str(directory))
+    # click.echo('Output:       ' + str(output))
+    # click.echo('file_format:  ' + str(file_format))
+    # click.echo('Quality:      ' + str(quality))
+    # click.echo('Size:         ' + str(size))
+    # click.echo('Append:       ' + str(append))
+    # click.echo('Metadata:     ' + str(metadata))
+    # click.echo('orientation:  ' + str(orientation))
+    # click.echo('Num Versions: ' + str(nversions))
+    # click.echo('Recursive:    ' + str(recursive))
+    click.echo('Config:       ' + str(config))
 
-    image_cruncher = ImageCruncher(image=image, directory=directory, output=output, format=format,
+    image_cruncher = CrunchHandler(image=image, directory=directory, output=output, file_format=file_format,
                                    quality=quality, size=size, append=append, metadata=metadata,
-                                   orientation=orientation, versions=versions, config=config)
+                                   orientation=orientation, nversions=nversions, recursive=recursive,
+                                   config=config)
 
-    click.echo('Image:       ' + str(image_cruncher.image))
-    click.echo('Directory:   ' + str(image_cruncher.directory))
-    click.echo('Output:      ' + str(image_cruncher.output))
-    click.echo('format:      ' + str(image_cruncher.format))
-    click.echo('Quality:     ' + str(image_cruncher.quality))
-    click.echo('Size:        ' + str(image_cruncher.size))
-    click.echo('Append:      ' + str(image_cruncher.append))
-    click.echo('Metadata:    ' + str(image_cruncher.metadata))
-    click.echo('orientation: ' + str(image_cruncher.orientation))
-    click.echo('Versions:    ' + str(image_cruncher.versions))
-    click.echo('Config:      ' + str(image_cruncher.config))
+    # click.echo('Mode :        ' + str(image_cruncher.mode))
+    # click.echo('Image:        ' + str(image_cruncher.image))
+    # click.echo('Directory:    ' + str(image_cruncher.directory))
+    # click.echo('Output:       ' + str(image_cruncher.output))
+    # click.echo('file_format:  ' + str(image_cruncher.file_format))
+    # click.echo('Quality:      ' + str(image_cruncher.quality))
+    # click.echo('Size:         ' + str(image_cruncher.size))
+    # click.echo('Append:       ' + str(image_cruncher.append))
+    # click.echo('Metadata:     ' + str(image_cruncher.metadata))
+    # click.echo('orientation:  ' + str(image_cruncher.orientation))
+    # click.echo('Num Versions: ' + str(image_cruncher.nversions))
+    # click.echo('Recursive:    ' + str(image_cruncher.recursive))
+    click.echo('Config:       ' + str(image_cruncher.config))
 
 
 if __name__ == '__main__':

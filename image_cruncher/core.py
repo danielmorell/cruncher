@@ -12,10 +12,9 @@ import json
 
 # Package Imports
 import click
-from PIL import Image
 
 # Local Imports
-from .cruncher import JPEGCruncher
+from .cruncher import GIFCruncher, JPEGCruncher, JPEG2000Cruncher, PNGCruncher, WebPCruncher
 
 SUPPORTED_FILES_EXTENSIONS = ['bmp', 'dib', 'jpg', 'jpeg', 'gif', 'tif', 'webp', 'png', 'ico', 'j2p', 'jpx']
 OUTPUT_FILE_FORMATS = ['JPEG', 'JPEG 2000', 'WebP', 'GIF', 'PNG']
@@ -139,6 +138,8 @@ class CrunchHandler:
 
     @staticmethod
     def parse_size(size):
+        if isinstance(size, tuple):
+            return size
         size = size.split(' ')
         return tuple([int(size[0]), int(size[1])])
 
@@ -193,4 +194,17 @@ class CrunchHandler:
         with click.progressbar(self.images, len(self.images), "Crunching images") as images:
             for image in images:
                 for version in self.versions:
-                    self.crunch_image(image, version)
+                    if self.mode == 'img':
+                        path = self.image
+                    else:
+                        path = self.directory
+                    if version.get('file_format') == 'GIF':
+                        GIFCruncher(self.mode, path, self.output, image, version)
+                    if version.get('file_format') == 'JPEG':
+                        JPEGCruncher(self.mode, path, self.output, image, version)
+                    if version.get('file_format') == 'JPEG2000':
+                        JPEG2000Cruncher(self.mode, path, self.output, image, version)
+                    if version.get('file_format') == 'PNG':
+                        PNGCruncher(self.mode, path, self.output, image, version)
+                    if version.get('file_format') == 'WebP':
+                        WebPCruncher(self.mode, path, self.output, image, version)

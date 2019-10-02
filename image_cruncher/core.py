@@ -17,7 +17,8 @@ import click
 from .cruncher import GIFCruncher, JPEGCruncher, JPEG2000Cruncher, PNGCruncher, WebPCruncher
 
 SUPPORTED_FILES_EXTENSIONS = ['bmp', 'dib', 'jpg', 'jpeg', 'gif', 'tif', 'webp', 'png', 'ico', 'j2p', 'jpx']
-OUTPUT_FILE_FORMATS = ['JPEG', 'JPEG 2000', 'WebP', 'GIF', 'PNG']
+OUTPUT_FILE_FORMATS = ['JPEG']
+FUTURE_FORMATS = ['JPEG 2000', 'WebP', 'GIF', 'PNG']
 
 
 class CrunchHandler:
@@ -37,30 +38,21 @@ class CrunchHandler:
         self.recursive = recursive
         self.versions = []
         self.images = []
+        self.directories = []
         self.config = config
-
-        click.echo('Init')
-
-        if directory != os.getcwd():
-            click.echo('Custom Dir')
 
         self.mode = self.check_mode()
 
         self.get_output_dir(output, directory)
         self.generate_versions()
         self.get_images()
+        self.build_output_directories()
 
         self.ncruches = self.get_num_crunches()
 
     def get_output_dir(self, output, directory):
         if output is None:
             self.output = os.path.join(directory, 'crunched')
-
-        if not os.path.isdir(self.output):
-            click.echo('-- New Output Dir')
-            os.makedirs(self.output)
-        else:
-            click.echo('-- Output Dir Exists')
 
     def generate_versions(self):
         if self.nversions > 1 and self.config is None:
@@ -102,14 +94,8 @@ class CrunchHandler:
     def get_images(self):
         if self.mode == 'img':
             self.images = [self.image]
-        elif self.recursive:
-            self.images = [image for image in self.scan_directory()]
         else:
-            for file in os.scandir(self.directory):
-                if file.is_file(follow_symlinks=False) and file.name.split('.')[-1] in SUPPORTED_FILES_EXTENSIONS:
-                    self.images.append(file.path)
-
-        # click.echo(self.images)
+            self.images = [image for image in self.scan_directory()]
 
     def scan_directory(self, path=None):
         """
@@ -122,11 +108,20 @@ class CrunchHandler:
         if not path:
             path = self.directory
         for node in os.scandir(path):
-            if self.recursive and node.is_dir(follow_symlinks=False):
-                yield from self.scan_directory(node.path)
-            elif node.is_file(follow_symlinks=False) and node.name.split('.')[-1] in SUPPORTED_FILES_EXTENSIONS:
-                click.echo(node.path)
+            if node.is_file(follow_symlinks=False) and node.name.split('.')[-1] in SUPPORTED_FILES_EXTENSIONS:
                 yield node.path
+            elif self.recursive and node.is_dir(follow_symlinks=False) and node.path != self.output:
+                self.directories.append(node.path)
+                yield from self.scan_directory(node.path)
+
+    def build_output_directories(self):
+        if not os.path.isdir(self.output):
+            os.makedirs(self.output)
+
+        for directory in self.directories:
+            new_dir = os.path.join(self.output, os.path.relpath(directory, self.directory))
+            if not os.path.isdir(new_dir):
+                os.makedirs(new_dir)
 
     def get_num_crunches(self):
         """

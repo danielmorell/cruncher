@@ -1,26 +1,33 @@
 {
     "image": "",
-    "directory": "O:\\Projects\\Image Cruncher\\Project Files\\tests\\test_images",
+    "directory": "O:\\Projects\\Image Cruncher\\Project Files\\tests\\test_images\\recursive",
     "output": "O:\\Projects\\Image Cruncher\\Project Files\\tests\\test_images\\crunched",
     "recursive": true,
     "versions": [
         {
             "file_format": "JPEG",
-            "quality": 70,
+            "quality": 40,
             "width": 200,
             "height": 200,
-            "append": "thumb",
+            "append": "_1",
             "keep_orientation": false,
             "keep_metadata": false
         },
         {
             "file_format": "JPEG",
-            "quality": 70,
-            "width": 600,
-            "height": 400,
-            "append": "full",
-            "keep_orientation": false,
+            "quality": 40,
+            "width": 500,
+            "height": 5000,
+            "append": "_2",
+            "keep_orientation": true,
             "keep_metadata": false
+        },
+        {
+            "file_format": "JPEG",
+            "quality": 40,
+            "width": null,
+            "height": null,
+            "append": "_3"
         }
     ]
 }

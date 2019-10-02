@@ -61,7 +61,7 @@ $ image_cruncher -o "C:\path_to_output_dir"
 
 **Default** `JPEG`
 
-The output image format of the final crunched image. Options are `GIF`, `JPEG`, `JPEG 2000`, `PNG`, and `WebP`.
+The output image format of the final crunched image. Options are currently only `JPEG`. Support for  `GIF`, `JPEG 2000`, `PNG`, and `WebP` is planned.
 
 **Example:**
 ```commandline

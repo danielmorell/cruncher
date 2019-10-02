@@ -93,7 +93,8 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS
     default=None,
     help='Specify a JSON file with your settings, this will override all other settings.'
 )
-def cli(image, directory, output, file_format, quality, size, append, metadata, orientation, nversions, recursive, config):
+def cli(image, directory, output, file_format, quality, size, append,
+        metadata, orientation, nversions, recursive, config):
     """
     Image Cruncher
 

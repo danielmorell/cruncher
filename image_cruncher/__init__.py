@@ -4,7 +4,6 @@
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
 :Author: DanielCMorell
-:Added v0.0.1.dev -- 9/26/2019
 """
 # Standard Library Imports
 import os
@@ -114,4 +113,4 @@ def cli(image, directory, output, file_format, quality, size, append,
 if __name__ == '__main__':
     cli()
 
-__version__ = '0.0.1.dev'
+__version__ = '0.1'

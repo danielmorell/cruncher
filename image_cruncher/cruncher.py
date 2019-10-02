@@ -4,7 +4,6 @@
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
 :Author: DanielCMorell
-:Added v0.0.1.dev -- 9/30/2019
 """
 # Standard Library Imports
 import os

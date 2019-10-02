@@ -7,7 +7,7 @@ Image Cruncher is a simple but powerful command line tool that optimizes images 
 Install and update Image Cruncher using [pip](https://pip.pypa.io/en/stable/quickstart/).
 
 ```
-$ pip install <pypi name here>
+$ pip install image-cruncher
 ```
 
 **Image Cruncher is built for Python 3.** It is tested on Python 3.6 and newer.

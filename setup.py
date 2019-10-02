@@ -6,7 +6,6 @@ setup.py
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
 :Author: DanielCMorell
-:Added v0.0.1 -- 9/26/2019
 """
 
 import io
@@ -21,11 +20,11 @@ with io.open("README.md", "rt", encoding='utf8') as fh:
 
 setup(
     name='image_cruncher',
-    version='0.0.1',
+    version=version,
     license='GPLv3+',
     url='https://github.com/danmorell/Image-Cruncher',
     author='Daniel Morell',
-    author_email='daniel@carintek.com',
+    author_email='office@carintek.com',
     description="Simple CLI to optimize images for the web.",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -39,7 +38,7 @@ setup(
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU General Public License v3 or later",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

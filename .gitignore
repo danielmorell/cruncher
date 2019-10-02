@@ -7,3 +7,6 @@
 .idea
 .vscode
 __pycache__
+build
+dist
+tests/test_images/crunched

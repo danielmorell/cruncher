@@ -1,5 +1,5 @@
 """
-:Project: Image Cruncher
+:Project: Cruncher
 :Contents: core.py
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
@@ -14,6 +14,7 @@ import click
 
 # Local Imports
 from .cruncher import GIFCruncher, JPEGCruncher, JPEG2000Cruncher, PNGCruncher, WebPCruncher
+from .utils import friendly_data_units
 
 SUPPORTED_FILES_EXTENSIONS = ['bmp', 'dib', 'jpg', 'jpeg', 'gif', 'tif', 'webp', 'png', 'ico', 'j2p', 'jpx']
 OUTPUT_FILE_FORMATS = ['JPEG']
@@ -48,6 +49,9 @@ class CrunchHandler:
         self.build_output_directories()
 
         self.ncruches = self.get_num_crunches()
+
+        self.input_bytes = 0
+        self.output_bytes = 0
 
     def get_output_dir(self, output, directory):
         if output is None:
@@ -188,18 +192,48 @@ class CrunchHandler:
     def run_cruncher(self):
         with click.progressbar(self.images, len(self.images), "Crunching images") as images:
             for image in images:
+                self.input_bytes += os.stat(image).st_size
                 for version in self.versions:
                     if self.mode == 'img':
                         path = self.image
                     else:
                         path = self.directory
                     if version.get('file_format') == 'GIF':
-                        GIFCruncher(self.mode, path, self.output, image, version)
+                        cruncher = GIFCruncher(self.mode, path, self.output, image, version)
+                        self.output_bytes += cruncher.output_bytes
                     if version.get('file_format') == 'JPEG':
-                        JPEGCruncher(self.mode, path, self.output, image, version)
+                        cruncher = JPEGCruncher(self.mode, path, self.output, image, version)
+                        self.output_bytes += cruncher.output_bytes
                     if version.get('file_format') == 'JPEG2000':
-                        JPEG2000Cruncher(self.mode, path, self.output, image, version)
+                        cruncher = JPEG2000Cruncher(self.mode, path, self.output, image, version)
+                        self.output_bytes += cruncher.output_bytes
                     if version.get('file_format') == 'PNG':
-                        PNGCruncher(self.mode, path, self.output, image, version)
+                        cruncher = PNGCruncher(self.mode, path, self.output, image, version)
+                        self.output_bytes += cruncher.output_bytes
                     if version.get('file_format') == 'WebP':
-                        WebPCruncher(self.mode, path, self.output, image, version)
+                        cruncher = WebPCruncher(self.mode, path, self.output, image, version)
+                        self.output_bytes += cruncher.output_bytes
+
+    def get_stats(self):
+        """
+        Build crunch statistics / information.
+        :return: Dictionary: Stats data
+        """
+        images = len(self.images)
+        versions = len(self.versions)
+        new_images = self.ncruches
+        input_bytes = self.input_bytes
+        output_bytes = self.output_bytes
+        percent_gain = round(100 - output_bytes * 100 / input_bytes, 2)
+        average_gain = round(100 - (output_bytes / new_images) * 100 / (input_bytes / images), 2)
+
+        stats = {
+            'images': images,
+            'versions': versions,
+            'new_images': new_images,
+            'input_bytes': friendly_data_units(input_bytes, 'B'),
+            'output_bytes': friendly_data_units(output_bytes, 'B'),
+            'percent_gain': percent_gain,
+            'average_gain': average_gain,
+        }
+        return stats

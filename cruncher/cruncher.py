@@ -1,5 +1,5 @@
 """
-:Project: Image Cruncher
+:Project: Cruncher
 :Contents: cruncher.py
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
@@ -17,19 +17,21 @@ import click
 
 class CruncherBase:
 
-    def __init__(self, mode, path, output, image_path, version):
+    def __init__(self, mode, path, output, image_path, version, file_format):
         self.mode = mode
         self.path = path
         self.output = output
         self.image_path = image_path
         self.version = version
+        self.format = file_format
         self.filename = self.generate_filename(os.path.split(image_path)[1], version)
         self.new_path = self.image_output_path(image_path)
         self.exif = b''
-
-        # click.echo(image_path)
+        self.output_bytes = 0
 
         self.crunch_image()
+
+        self.get_output_kb()
 
     def image_output_path(self, image_path):
         """
@@ -39,7 +41,6 @@ class CruncherBase:
         :return: Image output path.
         """
         if self.mode == 'img':
-            # image_name = os.path.split(image_path)[1]
             return os.path.join(self.output, self.filename)
         relative_path = os.path.relpath(image_path, self.path)
         relative_path = os.path.join(os.path.split(relative_path)[0], self.filename)
@@ -48,9 +49,11 @@ class CruncherBase:
     def crunch_image(self):
         pass
 
-    @staticmethod
-    def generate_filename(filename, version):
-        return f"{filename}{version['append']}"
+    def generate_filename(self, filename, version):
+        filename = filename.split('.')
+        del(filename[-1])
+        filename = '.'.join(filename)
+        return f"{filename}{version['append']}.{self.format}"
 
     @staticmethod
     def resize(image, size=None, version=None):
@@ -106,11 +109,17 @@ class CruncherBase:
             return 0
         return round(raw_sampling)
 
+    def get_output_kb(self):
+        """
+        Get the output file size, and save to `self.output_bytes`.
+        """
+        self.output_bytes = os.stat(self.new_path).st_size
+
 
 class GIFCruncher(CruncherBase):
 
     def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version)
+        super().__init__(mode, path, output, image_path, version, "gif")
 
     def crunch_image(self):
         image = Image.open(self.image_path)
@@ -137,17 +146,16 @@ class JPEGCruncher(CruncherBase):
     """
 
     def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version)
+        super().__init__(mode, path, output, image_path, version, "jpg")
 
     def crunch_image(self):
-        # print(self.image_path)
         image = Image.open(self.image_path).convert('RGB')
         if self.version['metadata'] and image.info.get('exif'):
             self.exif = image.info.get('exif')
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
         sampling = self.calculate_sampling([0, 1, 2], 40)
         image.save(
-            f"{self.new_path}.jpg",
+            self.new_path,
             "JPEG",
             quality=self.version['quality'],
             sampling=sampling,
@@ -160,7 +168,7 @@ class JPEGCruncher(CruncherBase):
 class JPEG2000Cruncher(CruncherBase):
 
     def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version)
+        super().__init__(mode, path, output, image_path, version, "jp2")
 
     def crunch_image(self):
         image = Image.open(self.image_path)
@@ -177,7 +185,7 @@ class JPEG2000Cruncher(CruncherBase):
 class PNGCruncher(CruncherBase):
 
     def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version)
+        super().__init__(mode, path, output, image_path, version, "png")
 
     def crunch_image(self):
         image = Image.open(self.image_path)
@@ -199,7 +207,7 @@ class PNGCruncher(CruncherBase):
 class WebPCruncher(CruncherBase):
 
     def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version)
+        super().__init__(mode, path, output, image_path, version, "webp")
 
     def crunch_image(self):
         image = Image.open(self.image_path)

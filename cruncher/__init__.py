@@ -1,5 +1,5 @@
 """
-:Project: Image Cruncher
+:Project: Cruncher
 :Contents: __init__.py
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
@@ -95,19 +95,32 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS
 def cli(image, directory, output, file_format, quality, size, append,
         metadata, orientation, nversions, recursive, config):
     """
-    Image Cruncher
+    Cruncher
 
     This is a simple CLI image optimization wrapper for the Python Image
-    Library fork Pillow. Image Cruncher takes images and scales them to
+    Library fork Pillow. Cruncher takes images and scales them to
     the specified size and quality.
     """
 
-    image_cruncher = CrunchHandler(image=image, directory=directory, output=output, file_format=file_format,
+    cruncher = CrunchHandler(image=image, directory=directory, output=output, file_format=file_format,
                                    quality=quality, size=size, append=append, metadata=metadata,
                                    orientation=orientation, nversions=nversions, recursive=recursive,
                                    config=config)
-    image_cruncher.run_cruncher()
-    click.echo("\nDone - All images have been crunched.")
+    cruncher.run_cruncher()
+
+    # Calculate Stats
+    stats = cruncher.get_stats()
+    click.echo(
+        f"\nDone :: All images have been crunched."
+        f"\n\nStats ::"
+        f"\nImages crunched: {stats['images']}"
+        f"\nVersions:        {stats['versions']}"
+        f"\nImages created:  {stats['new_images']}"
+        f"\nInput Size:      {stats['input_bytes'][0]} {stats['input_bytes'][1]}"
+        f"\nOutput Size:     {stats['output_bytes'][0]} {stats['output_bytes'][1]}"
+        f"\nPercent Reduced: {stats['percent_gain']}%"
+        f"\nAverage Reduce:  {stats['average_gain']}%"
+    )
 
 
 if __name__ == '__main__':

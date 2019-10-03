@@ -158,6 +158,7 @@ class CrunchHandler:
                 'append': self.get_config(version, 'append'),
                 'orientation': self.get_config(version, 'keep_orientation', False),
                 'metadata': self.get_config(version, 'keep_metadata', False),
+                'subsampling': self.get_config(version, 'subsampling', None)
             })
         self.nversions = len(versions)
         self.mode = self.check_mode()

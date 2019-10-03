@@ -27,7 +27,8 @@
             "quality": 75,
             "width": null,
             "height": null,
-            "append": "_3"
+            "append": "_3",
+            "subsampling": "4:4:4"
         }
     ]
 }

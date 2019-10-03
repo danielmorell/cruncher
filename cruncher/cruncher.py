@@ -103,6 +103,8 @@ class CruncherBase:
         return resized
 
     def calculate_sampling(self, options, base):
+        if self.version['subsampling']:
+            return self.version['subsampling']
         divisor = (100 - base) / len(options)
         raw_sampling = ((self.version['quality'] - base) / divisor) - 1
         if raw_sampling < 0:
@@ -149,20 +151,32 @@ class JPEGCruncher(CruncherBase):
         super().__init__(mode, path, output, image_path, version, "jpg")
 
     def crunch_image(self):
-        image = Image.open(self.image_path).convert('RGB')
+        image = Image.open(self.image_path)
         if self.version['metadata'] and image.info.get('exif'):
             self.exif = image.info.get('exif')
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
         sampling = self.calculate_sampling([0, 1, 2], 40)
-        image.save(
-            self.new_path,
-            "JPEG",
-            quality=self.version['quality'],
-            sampling=sampling,
-            optimize=True,
-            progressive=True,
-            exif=self.exif
-        )
+        try:
+            image.save(
+                self.new_path,
+                "JPEG",
+                quality=self.version['quality'],
+                sampling=sampling,
+                optimize=True,
+                progressive=True,
+                exif=self.exif
+            )
+        except IOError:
+            image = image.convert('RGB')
+            image.save(
+                self.new_path,
+                "JPEG",
+                quality=self.version['quality'],
+                sampling=sampling,
+                optimize=True,
+                progressive=True,
+                exif=self.exif
+            )
 
 
 class JPEG2000Cruncher(CruncherBase):

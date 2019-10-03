@@ -117,6 +117,10 @@ class CruncherBase:
         """
         self.output_bytes = os.stat(self.new_path).st_size
 
+    @staticmethod
+    def _save(image, *args, **kwargs):
+        image.save(*args, **kwargs)
+
 
 class GIFCruncher(CruncherBase):
 
@@ -131,12 +135,9 @@ class GIFCruncher(CruncherBase):
         if image.info.get('transparency'):
             transparency = image.info.get('transparency')
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
-        image.save(
-            self.new_path,
-            "GIF",
-            optimize=True,
-            transparency=transparency
-        )
+        args = [self.new_path, "GIF"]
+        kwargs = {'optimize': True, 'transparency': transparency}
+        self._save(image, *args, **kwargs)
 
 
 class JPEGCruncher(CruncherBase):
@@ -156,27 +157,19 @@ class JPEGCruncher(CruncherBase):
             self.exif = image.info.get('exif')
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
         sampling = self.calculate_sampling([0, 1, 2], 40)
+        args = [self.new_path, "JPEG"]
+        kwargs = {
+            'quality': self.version['quality'],
+            'sampling': sampling,
+            'optimize': True,
+            'progressive': True,
+            'exif': self.exif
+        }
         try:
-            image.save(
-                self.new_path,
-                "JPEG",
-                quality=self.version['quality'],
-                sampling=sampling,
-                optimize=True,
-                progressive=True,
-                exif=self.exif
-            )
+            self._save(image, *args, **kwargs)
         except IOError:
             image = image.convert('RGB')
-            image.save(
-                self.new_path,
-                "JPEG",
-                quality=self.version['quality'],
-                sampling=sampling,
-                optimize=True,
-                progressive=True,
-                exif=self.exif
-            )
+            self._save(image, *args, **kwargs)
 
 
 class JPEG2000Cruncher(CruncherBase):
@@ -187,13 +180,13 @@ class JPEG2000Cruncher(CruncherBase):
     def crunch_image(self):
         image = Image.open(self.image_path)
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
-        image.save(
-            self.new_path,
-            "JPEG",
-            quality_mode='dB',
-            quality_layers=self.version['quality'],
-            progressive=True
-        )
+        args = [self.new_path, "JPEG2000"]
+        kwargs = {
+            'quality_mode': 'dB',
+            'quality_layers': self.version['quality'],
+            'progressive': True
+        }
+        self._save(image, *args, **kwargs)
 
 
 class PNGCruncher(CruncherBase):
@@ -209,13 +202,13 @@ class PNGCruncher(CruncherBase):
         if image.info.get('transparency'):
             transparency = image.info.get('transparency')
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
-        image.save(
-            self.new_path,
-            "PNG",
-            optimize=True,
-            exif=self.exif,
-            transparency=transparency
-        )
+        args = [self.new_path, "PNG"]
+        kwargs = {
+            'optimize': True,
+            'exif': self.exif,
+            'transparency': transparency
+        }
+        self._save(image, *args, **kwargs)
 
 
 class WebPCruncher(CruncherBase):
@@ -228,10 +221,10 @@ class WebPCruncher(CruncherBase):
         if self.version['metadata'] and image.info.get('exif'):
             self.exif = image.info.get('exif')
         image = self.resize(image, (self.version['width'], self.version['height']), self.version)
-        image.save(
-            self.new_path,
-            "WebP",
-            quality=(100 - self.version['quality']),
-            method=0,
-            exif=self.exif
-        )
+        args = [self.new_path, "WEBP"]
+        kwargs = {
+            'quality': (100 - self.version['quality']),
+            'method': 0,
+            'exif': self.exif
+        }
+        self._save(image, *args, **kwargs)

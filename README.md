@@ -1,16 +1,16 @@
-# Image Cruncher
+# Cruncher
 
-Image Cruncher is a simple but powerful command line tool that optimizes images for the web.
+Cruncher is a simple but powerful command line tool that optimizes images for the web.
 
 ## Installing
 
-Install and update Image Cruncher using [pip](https://pip.pypa.io/en/stable/quickstart/).
+Install and update Cruncher using [pip](https://pip.pypa.io/en/stable/quickstart/).
 
 ```
 $ pip install image-cruncher
 ```
 
-**Image Cruncher is built for Python 3.** It is tested on Python 3.6 and newer.
+**Cruncher is built for Python 3.** It is tested on Python 3.6 and newer.
 
 ## Usage
 
@@ -26,7 +26,7 @@ The absolute path to the image to be crunched.
 
 **Example:**
 ```commandline
-$ image_cruncher -i "C:\path_to_image\the_image.jpg"
+$ cruncher -i "C:\path_to_image\the_image.jpg"
 ```
 
 ### `-d` and `--directory`
@@ -39,7 +39,7 @@ The absolute path to the directory of images to be crunched.
 
 **Example:**
 ```commandline
-$ image_cruncher -d "C:\path_to_images_dir"
+$ cruncher -d "C:\path_to_images_dir"
 ```
 
 ### `-o` and `--output`
@@ -52,7 +52,7 @@ The absolute path to the directory where crunched images will be placed.
 
 **Example:**
 ```commandline
-$ image_cruncher -o "C:\path_to_output_dir"
+$ cruncher -o "C:\path_to_output_dir"
 ```
 
 ### `-f` and `--format`
@@ -65,7 +65,7 @@ The output image format of the final crunched image. Options are currently only 
 
 **Example:**
 ```commandline
-$ image_cruncher -f PNG
+$ cruncher -f PNG
 ```
 
 ### `-q` and `--quality`
@@ -78,7 +78,7 @@ The quality of the image after it is crunched. May be any integer between `1` an
 
 **Example:**
 ```commandline
-$ image_cruncher -q 75
+$ cruncher -q 75
 ```
 
 ### `-s` and `--size`
@@ -91,7 +91,7 @@ The pixel `width height` of the image after it is crunched. This should be two i
 
 **Example:**
 ```commandline
-$ image_cruncher -s 300 200
+$ cruncher -s 300 200
 ```
 
 ### `-a` and `--append`
@@ -104,7 +104,7 @@ Append a string to the image filename.
 
 **Example:**
 ```commandline
-$ image_cruncher -a "_thumbnail"
+$ cruncher -a "_thumbnail"
 ```
 
 ### `--ignore-orientation`
@@ -117,7 +117,7 @@ Include this flag to ignore the original image orientation. I.e. if `--size` is 
 
 **Example:**
 ```commandline
-$ image_cruncher --ignore-orientation
+$ cruncher --ignore-orientation
 ```
 
 ### `-m` and `--keep-metadata`
@@ -130,7 +130,7 @@ Include this flag to keep the image meta/exif. Metadata is removed by default.
 
 **Example:**
 ```commandline
-$ image_cruncher -m
+$ cruncher -m
 ```
 
 ### `-v` and `--versions`
@@ -143,7 +143,7 @@ The number of versions to create for each image. If this is set to more than `1`
 
 **Example:**
 ```commandline
-$ image_cruncher -v 2
+$ cruncher -v 2
 Please enter the needed information for each version.
 Version 1
 Size WIDTH HEIGHT: 200 200
@@ -173,7 +173,7 @@ Get images from sub directories also. Only applicable if `--directory` is used.
 
 **Example:**
 ```commandline
-$ image_cruncher -r
+$ cruncher -r
 ```
 
 ### `-c` and `--config`
@@ -186,7 +186,7 @@ Specify the absolute path to a JSON file with your settings. JSON configs will o
 
 **Example:**
 ```commandline
-$ image_cruncher -c "C:\path_to_config_file\config.json"
+$ cruncher -c "C:\path_to_config_file\config.json"
 ```
 
 ### `--help`
@@ -195,7 +195,7 @@ Show the help message and exit.
 
 **Example:**
 ```commandline
-$ image_cruncher -help
+$ cruncher -help
 ```
 
 ### JSON Config Options
@@ -207,7 +207,7 @@ Any settings in the config file will override the same setting if it was provide
 For example, if the following command pointed to the example config file below, The image `directory` would be `C:\path_to_images_dir\images`.
 
 ```commandline
-$ image_cruncher -d "C:\other_image_dir\" -c "C:\path_to_config\config.json"
+$ cruncher -d "C:\other_image_dir\" -c "C:\path_to_config\config.json"
 ```
 
 ```json
@@ -246,7 +246,7 @@ $ image_cruncher -d "C:\other_image_dir\" -c "C:\path_to_config\config.json"
 #### Path does not exist
 
 ```
-$ image_cruncher -i C:\Projects\Image Dir\image.png -S 1000 600
+$ cruncher -i C:\Projects\Image Dir\image.png -S 1000 600
 
 Error: Invalid value for "-i" / "--file": Path "C:\Projects\Image" does not exist.
 ```
@@ -254,7 +254,7 @@ Error: Invalid value for "-i" / "--file": Path "C:\Projects\Image" does not exis
 This error is cause because there is a blank space in the path to correct this wrap the path in double quotes.
 
 ```
-$ image_cruncher -i "C:\Projects\Image Dir\image.png" -S 1000 600
+$ cruncher -i "C:\Projects\Image Dir\image.png" -S 1000 600
 ```
 
 This applies to `--directory`, `--image`, `--output`, and `--config` options.

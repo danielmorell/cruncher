@@ -20,10 +20,10 @@ setup(
     name='cruncher',
     version=version,
     license='GPLv3+',
-    url='https://github.com/danmorell/Image-Cruncher',
+    url='https://github.com/danmorell/cruncher',
     project_urls={
-        "Source Code": "https://github.com/danmorell/Image-Cruncher",
-        "Issue tracker": "https://github.com/danmorell/Image-Cruncher/issues",
+        "Source Code": "https://github.com/danmorell/cruncher",
+        "Issue tracker": "https://github.com/danmorell/cruncher/issues",
     },
     author='Daniel Morell',
     author_email='office@carintek.com',

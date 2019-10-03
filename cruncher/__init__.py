@@ -126,4 +126,4 @@ def cli(image, directory, output, file_format, quality, size, append,
 if __name__ == '__main__':
     cli()
 
-__version__ = '0.1'
+__version__ = '0.1.1'

@@ -1,7 +1,5 @@
 """
-setup.py
-
-:Project: Image Cruncher
+:Project: Cruncher
 :Contents: setup.py
 :copyright: © 2019 Daniel Morell
 :license: GPL-3.0, see LICENSE for more details.
@@ -12,26 +10,31 @@ import io
 import re
 from setuptools import setup
 
-with io.open("image_cruncher/__init__.py", "rt", encoding="utf8") as f:
+with io.open("cruncher/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r"__version__ = '(.*?)'", f.read()).group(1)
 
 with io.open("README.md", "rt", encoding='utf8') as fh:
     readme = fh.read()
 
 setup(
-    name='image_cruncher',
+    name='cruncher',
     version=version,
     license='GPLv3+',
     url='https://github.com/danmorell/Image-Cruncher',
+    project_urls={
+        "Source Code": "https://github.com/danmorell/Image-Cruncher",
+        "Issue tracker": "https://github.com/danmorell/Image-Cruncher/issues",
+    },
     author='Daniel Morell',
     author_email='office@carintek.com',
     description="Simple CLI to optimize images for the web.",
     long_description=readme,
     long_description_content_type="text/markdown",
-    py_modules=['image_cruncher'],
+    py_modules=['cruncher'],
+    packages=['cruncher'],
     install_requires=[
-        'Click',
-        'Pillow',
+        'click',
+        'pillow',
     ],
     include_package_data=True,
     python_requires=">=3.6",
@@ -47,6 +50,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        image_cruncher=image_cruncher:cli
+        cruncher=cruncher:cli
     ''',
 )

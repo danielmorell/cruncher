@@ -7,8 +7,10 @@ Cruncher is a simple but powerful command line tool that optimizes images for th
 Install and update Cruncher using [pip](https://pip.pypa.io/en/stable/quickstart/).
 
 ```
-$ pip install image-cruncher
+$ pip install cruncher
 ```
+
+It is highly recommenced that you run Cruncher with [virualenv](https://virtualenv.pypa.io/en/latest/). This can abstract away the peculiarities of running Cruncher across multiple operating systems.
 
 **Cruncher is built for Python 3.** It is tested on Python 3.6 and newer.
 

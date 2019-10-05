@@ -9,7 +9,7 @@
 import os
 
 # Package Imports
-from PIL import Image
+from PIL import Image, ImageCms
 import click
 
 # Local Imports
@@ -17,19 +17,30 @@ import click
 
 class CruncherBase:
 
-    def __init__(self, mode, path, output, image_path, version, file_format):
+    def __init__(self, mode, path, output, image_path, version, file_format, settings):
+        self.image = None
         self.mode = mode
         self.path = path
         self.output = output
         self.image_path = image_path
         self.version = version
         self.format = file_format
+        self.settings = settings
         self.filename = self.generate_filename(os.path.split(image_path)[1], version)
         self.new_path = self.image_output_path(image_path)
         self.exif = b''
         self.output_bytes = 0
+        self.messages = []
 
-        self.crunch_image()
+        # Open Image
+        self.open_image()  # Step 1
+
+        # Run conversions and resizing
+        self.convert_icc_profile()
+        self.resize()
+
+        # Crunch the image
+        self.crunch_image()  # needs o call self._save()
 
         self.get_output_kb()
 
@@ -55,18 +66,15 @@ class CruncherBase:
         filename = '.'.join(filename)
         return f"{filename}{version['append']}.{self.format}"
 
-    @staticmethod
-    def resize(image, size=None, version=None):
+    def resize(self):
         """
         The `resize()` function changes the size of an image without squashing or stretching
-        as the PIL.Image.resize() function does. The `size` argument should be a tuple formatted
-        as (width, height).
-
-        :param image: PIL image object
-        :param size: Tuple with 2 values (width, height)
-        :param version: The image version dictionary.
-        :return: PIL image object
+        as the PIL.Image.resize() function does.
         """
+
+        image = self.image
+        size = (self.version['width'], self.version['height'])
+        version = self.version
 
         if size == (None, None):
             return image
@@ -100,7 +108,7 @@ class CruncherBase:
 
         box = (left, top, right, bottom)
         resized = image.resize(size, Image.LANCZOS, box)
-        return resized
+        self.image = resized
 
     def calculate_sampling(self, options, base):
         if self.version['subsampling']:
@@ -111,33 +119,52 @@ class CruncherBase:
             return 0
         return round(raw_sampling)
 
+    def convert_icc_profile(self):
+        try:
+            if (self.version.get('icc_conversion')
+                    and self.settings.get('icc_conversions').get(self.version['icc_conversion'])):
+                icc = self.settings['icc_conversions'][self.version['icc_conversion']]
+                self.image = ImageCms.profileToProfile(
+                    self.image,
+                    inputProfile=icc.get('input_icc'),
+                    outputProfile=icc.get('output_icc'),
+                    renderingIntent=0,
+                    outputMode=icc.get('mode')
+                )
+        except ImageCms.PyCMSError as e:
+            self.messages.append(f'Image ICC profile conversion failed: {self.image_path}')
+
+    def get_transparency(self, default=None):
+        transparency = default
+        if self.image.info.get('transparency'):
+            transparency = self.image.info.get('transparency')
+        return transparency
+
     def get_output_kb(self):
         """
         Get the output file size, and save to `self.output_bytes`.
         """
         self.output_bytes = os.stat(self.new_path).st_size
 
-    @staticmethod
-    def _save(image, *args, **kwargs):
-        image.save(*args, **kwargs)
+    def open_image(self):
+        self.image = Image.open(self.image_path)
+        if self.version['metadata'] and self.image.info.get('exif'):
+            self.exif = self.image.info.get('exif')
+
+    def _save(self, *args, **kwargs):
+        self.image.save(*args, **kwargs)
 
 
 class GIFCruncher(CruncherBase):
 
-    def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version, "gif")
+    def __init__(self, mode, path, output, image_path, version, settings):
+        super().__init__(mode, path, output, image_path, version, "gif", settings)
 
     def crunch_image(self):
-        image = Image.open(self.image_path)
-        if self.version['metadata'] and image.info.get('exif'):
-            self.exif = image.info.get('exif')
-        transparency = None
-        if image.info.get('transparency'):
-            transparency = image.info.get('transparency')
-        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        transparency = self.get_transparency()
         args = [self.new_path, "GIF"]
         kwargs = {'optimize': True, 'transparency': transparency}
-        self._save(image, *args, **kwargs)
+        self._save(self.image, *args, **kwargs)
 
 
 class JPEGCruncher(CruncherBase):
@@ -148,14 +175,10 @@ class JPEGCruncher(CruncherBase):
         90 - 100: 4:4:4
     """
 
-    def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version, "jpg")
+    def __init__(self, mode, path, output, image_path, version, settings):
+        super().__init__(mode, path, output, image_path, version, "jpg", settings)
 
     def crunch_image(self):
-        image = Image.open(self.image_path)
-        if self.version['metadata'] and image.info.get('exif'):
-            self.exif = image.info.get('exif')
-        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
         sampling = self.calculate_sampling([0, 1, 2], 40)
         args = [self.new_path, "JPEG"]
         kwargs = {
@@ -163,23 +186,23 @@ class JPEGCruncher(CruncherBase):
             'sampling': sampling,
             'optimize': True,
             'progressive': True,
-            'exif': self.exif
+            'exif': self.exif,
+            'icc_profile': self.image.info.get('icc_profile')
         }
         try:
-            self._save(image, *args, **kwargs)
+            self._save(*args, **kwargs)
         except IOError:
-            image = image.convert('RGB')
-            self._save(image, *args, **kwargs)
+            self.image = self.image.convert('RGB')
+            self._save(*args, **kwargs)
 
 
 class JPEG2000Cruncher(CruncherBase):
 
-    def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version, "jp2")
+    def __init__(self, mode, path, output, image_path, version, settings):
+        super().__init__(mode, path, output, image_path, version, "jp2", settings)
 
     def crunch_image(self):
         image = Image.open(self.image_path)
-        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
         args = [self.new_path, "JPEG2000"]
         kwargs = {
             'quality_mode': 'dB',
@@ -191,36 +214,32 @@ class JPEG2000Cruncher(CruncherBase):
 
 class PNGCruncher(CruncherBase):
 
-    def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version, "png")
+    def __init__(self, mode, path, output, image_path, version, settings):
+        super().__init__(mode, path, output, image_path, version, "png", settings)
 
     def crunch_image(self):
         image = Image.open(self.image_path)
-        if self.version['metadata'] and image.info.get('exif'):
-            self.exif = image.info.get('exif')
-        transparency = None
-        if image.info.get('transparency'):
-            transparency = image.info.get('transparency')
-        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
+        transparency = self.get_transparency()
         args = [self.new_path, "PNG"]
         kwargs = {
             'optimize': True,
             'exif': self.exif,
             'transparency': transparency
         }
-        self._save(image, *args, **kwargs)
+        try:
+            self._save(image, *args, **kwargs)
+        except IOError:
+            image = image.convert('RGB')
+            self._save(image, *args, **kwargs)
 
 
 class WebPCruncher(CruncherBase):
 
-    def __init__(self, mode, path, output, image_path, version):
-        super().__init__(mode, path, output, image_path, version, "webp")
+    def __init__(self, mode, path, output, image_path, version, settings):
+        super().__init__(mode, path, output, image_path, version, "webp", settings)
 
     def crunch_image(self):
         image = Image.open(self.image_path)
-        if self.version['metadata'] and image.info.get('exif'):
-            self.exif = image.info.get('exif')
-        image = self.resize(image, (self.version['width'], self.version['height']), self.version)
         args = [self.new_path, "WEBP"]
         kwargs = {
             'quality': (100 - self.version['quality']),

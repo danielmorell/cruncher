@@ -9,4 +9,5 @@
 __pycache__
 build
 dist
+temp
 tests/test_images/crunched

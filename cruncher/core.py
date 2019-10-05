@@ -17,8 +17,10 @@ from .cruncher import GIFCruncher, JPEGCruncher, JPEG2000Cruncher, PNGCruncher, 
 from .utils import friendly_data_units
 
 SUPPORTED_FILES_EXTENSIONS = ['bmp', 'dib', 'jpg', 'jpeg', 'gif', 'tif', 'webp', 'png', 'ico', 'j2p', 'jpx']
-OUTPUT_FILE_FORMATS = ['JPEG']
-FUTURE_FORMATS = ['JPEG 2000', 'WebP', 'GIF', 'PNG']
+OUTPUT_FILE_FORMATS = ['JPEG', 'PNG']
+FUTURE_FORMATS = ['JPEG 2000', 'WebP', 'GIF']
+
+ERROR_HANDLING = ["strict", "errors", "warnings", "silent"]
 
 
 class CrunchHandler:
@@ -33,6 +35,7 @@ class CrunchHandler:
         self.size = size
         self.append = append
         self.metadata = metadata
+        self.settings = {}
         self.orientation = orientation
         self.nversions = nversions
         self.recursive = recursive
@@ -40,6 +43,7 @@ class CrunchHandler:
         self.images = []
         self.directories = []
         self.config = config
+        self.messages =[]
 
         self.mode = self.check_mode()
 
@@ -147,6 +151,7 @@ class CrunchHandler:
         self.directory = self.get_config(configs, 'directory', self.directory)
         self.output = self.get_config(configs, 'output', self.output)
         self.recursive = self.get_config(configs, 'recursive', self.recursive)
+        self.settings['icc_conversions'] = self.get_config(configs, 'icc_conversions', None)
         self.versions = []
         versions = configs.get('versions')
         for version in versions:
@@ -158,7 +163,8 @@ class CrunchHandler:
                 'append': self.get_config(version, 'append'),
                 'orientation': self.get_config(version, 'keep_orientation', False),
                 'metadata': self.get_config(version, 'keep_metadata', False),
-                'subsampling': self.get_config(version, 'subsampling', None)
+                'subsampling': self.get_config(version, 'subsampling', None),
+                'icc_conversion': self.get_config(version, 'icc_conversion', None)
             })
         self.nversions = len(versions)
         self.mode = self.check_mode()
@@ -200,20 +206,25 @@ class CrunchHandler:
                     else:
                         path = self.directory
                     if version.get('file_format') == 'GIF':
-                        cruncher = GIFCruncher(self.mode, path, self.output, image, version)
+                        cruncher = GIFCruncher(self.mode, path, self.output, image, version, self.settings)
                         self.output_bytes += cruncher.output_bytes
+                        self.messages += cruncher.messages
                     if version.get('file_format') == 'JPEG':
-                        cruncher = JPEGCruncher(self.mode, path, self.output, image, version)
+                        cruncher = JPEGCruncher(self.mode, path, self.output, image, version, self.settings)
                         self.output_bytes += cruncher.output_bytes
+                        self.messages += cruncher.messages
                     if version.get('file_format') == 'JPEG2000':
-                        cruncher = JPEG2000Cruncher(self.mode, path, self.output, image, version)
+                        cruncher = JPEG2000Cruncher(self.mode, path, self.output, image, version, self.settings)
                         self.output_bytes += cruncher.output_bytes
+                        self.messages += cruncher.messages
                     if version.get('file_format') == 'PNG':
-                        cruncher = PNGCruncher(self.mode, path, self.output, image, version)
+                        cruncher = PNGCruncher(self.mode, path, self.output, image, version, self.settings)
                         self.output_bytes += cruncher.output_bytes
+                        self.messages += cruncher.messages
                     if version.get('file_format') == 'WebP':
-                        cruncher = WebPCruncher(self.mode, path, self.output, image, version)
+                        cruncher = WebPCruncher(self.mode, path, self.output, image, version, self.settings)
                         self.output_bytes += cruncher.output_bytes
+                        self.messages += cruncher.messages
 
     def get_stats(self):
         """
@@ -238,3 +249,7 @@ class CrunchHandler:
             'average_gain': average_gain,
         }
         return stats
+
+    def print_messages(self):
+        for message in self.messages:
+            click.echo(message)

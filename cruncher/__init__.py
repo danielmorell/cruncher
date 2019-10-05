@@ -12,7 +12,7 @@ import os
 import click
 
 # Local Imports
-from .core import CrunchHandler, OUTPUT_FILE_FORMATS
+from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 
 
 @click.command()
@@ -92,6 +92,13 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS
     default=None,
     help='Specify a JSON file with your settings, this will override all other settings.'
 )
+# @click.option(
+#     '-e', '--errors', 'errors',
+#     type=click.Choice(ERROR_HANDLING, case_sensitive=False),
+#     default='errors',
+#     show_default=True,
+#     help='Specify how Cruncher should handle errors.'
+# )
 def cli(image, directory, output, file_format, quality, size, append,
         metadata, orientation, nversions, recursive, config):
     """
@@ -121,6 +128,8 @@ def cli(image, directory, output, file_format, quality, size, append,
         f"\nPercent Reduced: {stats['percent_gain']}%"
         f"\nAverage Reduce:  {stats['average_gain']}%"
     )
+
+    cruncher.print_messages()
 
 
 if __name__ == '__main__':

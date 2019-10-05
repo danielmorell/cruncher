@@ -42,6 +42,7 @@ Please read the documentation for more details about these options and the other
 1. [Installation](https://www.danielmorell.com/tools/cruncher/documentation/installation)
 1. [CLI Options](https://www.danielmorell.com/tools/cruncher/documentation/cli-options)
 1. [JSON Configuration](https://www.danielmorell.com/tools/cruncher/documentation/json-configuration)
+1. [ICC Profile Conversion](https://www.danielmorell.com/tools/cruncher/documentation/icc-profile-conversion)
 1. [Troubleshooting](https://www.danielmorell.com/tools/cruncher/documentation/troubleshooting)
 
 ## Contributors

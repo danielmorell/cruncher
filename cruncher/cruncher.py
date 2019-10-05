@@ -120,6 +120,12 @@ class CruncherBase:
         return round(raw_sampling)
 
     def convert_icc_profile(self):
+        """
+        Converts image colors based on the input and output ICC profiles.
+
+        :since: v0.2
+        :return:
+        """
         try:
             if (self.version.get('icc_conversion')
                     and self.settings.get('icc_conversions').get(self.version['icc_conversion'])):

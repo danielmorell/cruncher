@@ -61,6 +61,8 @@ class CruncherBase:
         pass
 
     def generate_filename(self, filename, version):
+        if not version['append']:
+            version['append'] = ''
         filename = filename.split('.')
         del(filename[-1])
         filename = '.'.join(filename)

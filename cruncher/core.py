@@ -95,7 +95,8 @@ class CrunchHandler:
                 'quality': self.quality,
                 'append': self.append,
                 'orientation': self.orientation,
-                'metadata': self.metadata
+                'metadata': self.metadata,
+                'subsampling': -1
             })
 
     def get_images(self):

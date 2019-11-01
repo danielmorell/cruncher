@@ -110,9 +110,9 @@ def cli(image, directory, output, file_format, quality, size, append,
     """
 
     cruncher = CrunchHandler(image=image, directory=directory, output=output, file_format=file_format,
-                                   quality=quality, size=size, append=append, metadata=metadata,
-                                   orientation=orientation, nversions=nversions, recursive=recursive,
-                                   config=config)
+                             quality=quality, size=size, append=append, metadata=metadata,
+                             orientation=orientation, nversions=nversions, recursive=recursive,
+                             config=config)
     cruncher.run_cruncher()
 
     # Calculate Stats
@@ -135,4 +135,4 @@ def cli(image, directory, output, file_format, quality, size, append,
 if __name__ == '__main__':
     cli()
 
-__version__ = '0.2'
+__version__ = '0.2.1'

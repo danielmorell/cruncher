@@ -92,6 +92,12 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
     default=None,
     help='Specify a JSON file with your settings, this will override all other settings.'
 )
+@click.option(
+    '-V', '--version', 'version',
+    is_flag=True,
+    default=None,
+    help='Returns the version of Cruncher.'
+)
 # @click.option(
 #     '-e', '--errors', 'errors',
 #     type=click.Choice(ERROR_HANDLING, case_sensitive=False),
@@ -100,7 +106,7 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 #     help='Specify how Cruncher should handle errors.'
 # )
 def cli(image, directory, output, file_format, quality, size, append,
-        metadata, orientation, nversions, recursive, config):
+        metadata, orientation, nversions, recursive, config, version):
     """
     Cruncher
 
@@ -108,6 +114,9 @@ def cli(image, directory, output, file_format, quality, size, append,
     Library fork Pillow. Cruncher takes images and scales them to
     the specified size and quality.
     """
+    if version is not None:
+        click.echo('Cruncher ' + __version__)
+        return
 
     cruncher = CrunchHandler(image=image, directory=directory, output=output, file_format=file_format,
                              quality=quality, size=size, append=append, metadata=metadata,

@@ -253,4 +253,4 @@ class CrunchHandler:
 
     def print_messages(self):
         for message in self.messages:
-            click.echo(message)
+            click.echo(f'\n{message}')

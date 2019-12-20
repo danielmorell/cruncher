@@ -116,7 +116,7 @@ class CrunchHandler:
         if not path:
             path = self.directory
         for node in os.scandir(path):
-            if node.is_file(follow_symlinks=False) and node.name.split('.')[-1] in SUPPORTED_FILES_EXTENSIONS:
+            if node.is_file(follow_symlinks=False) and node.name.split('.')[-1].lower() in SUPPORTED_FILES_EXTENSIONS:
                 yield node.path
             elif self.recursive and node.is_dir(follow_symlinks=False) and node.path != self.output:
                 self.directories.append(node.path)

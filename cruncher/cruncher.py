@@ -18,6 +18,7 @@ import click
 class CruncherBase:
 
     def __init__(self, mode, path, output, image_path, version, file_format, settings):
+        self.skip_image = False
         self.image = None
         self.mode = mode
         self.path = path
@@ -35,9 +36,15 @@ class CruncherBase:
         # Open Image
         self.open_image()  # Step 1
 
+        if self.skip_image:
+            return
+
         # Run conversions and resizing
         self.convert_icc_profile()
         self.resize()
+
+        if self.skip_image:
+            return
 
         # Crunch the image
         self.crunch_image()  # needs o call self._save()
@@ -109,7 +116,13 @@ class CruncherBase:
             bottom = image.height - top
 
         box = (left, top, right, bottom)
-        resized = image.resize(size, Image.LANCZOS, box)
+        try:
+            resized = image.resize(size, Image.LANCZOS, box)
+        except ValueError:
+            self.messages.append(f'\n Image: {self.image_path} skipped because of resize error')
+            self.skip_image = True
+            return
+
         self.image = resized
 
     def calculate_sampling(self, options, base):
@@ -141,6 +154,7 @@ class CruncherBase:
                 )
         except ImageCms.PyCMSError as e:
             self.messages.append(f'Image ICC profile conversion failed: {self.image_path}')
+            self.skip_image = True
 
     def get_transparency(self, default=None):
         transparency = default
@@ -155,6 +169,15 @@ class CruncherBase:
         self.output_bytes = os.stat(self.new_path).st_size
 
     def open_image(self):
+        try:
+            self.image = Image.open(self.image_path)
+        except Image.DecompressionBombError as e:
+            if click.confirm(f'\n{e}\nPath: {self.image_path}\nDo you want to try to crunch this image? '):
+                Image.MAX_IMAGE_PIXELS = None
+            else:
+                self.skip_image = True
+                self.messages.append(f'Image: {self.image_path} skipped because of decompression bomb error')
+                return
         self.image = Image.open(self.image_path)
         if self.version['metadata'] and self.image.info.get('exif'):
             self.exif = self.image.info.get('exif')

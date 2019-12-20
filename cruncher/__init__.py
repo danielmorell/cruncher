@@ -14,6 +14,8 @@ import click
 # Local Imports
 from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 
+__version__ = '0.2.2'
+
 
 @click.command()
 @click.option(
@@ -108,7 +110,7 @@ from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 def cli(image, directory, output, file_format, quality, size, append,
         metadata, orientation, nversions, recursive, config, version):
     """
-    Cruncher
+    Cruncher 0.2.2
 
     This is a simple CLI image optimization wrapper for the Python Image
     Library fork Pillow. Cruncher takes images and scales them to
@@ -143,5 +145,3 @@ def cli(image, directory, output, file_format, quality, size, append,
 
 if __name__ == '__main__':
     cli()
-
-__version__ = '0.2.1'

@@ -14,7 +14,7 @@ $ pip install cruncher
 
 It is highly recommenced that you run Cruncher with [virualenv](https://virtualenv.pypa.io/en/latest/). This can abstract away the peculiarities of running Cruncher across multiple operating systems.
 
-**Cruncher is built for Python 3.** It is tested on Python 3.6 and newer.
+**Cruncher is built for Python 3.** It is tested the last three minor versions of Python (currently 3.6 to 3.8).
 
 ## Basic Usage
 

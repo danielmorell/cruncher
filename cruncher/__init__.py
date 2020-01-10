@@ -14,7 +14,7 @@ import click
 # Local Imports
 from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 
-__version__ = '0.2.2'
+__version__ = '0.3.0'
 
 
 @click.command()
@@ -64,10 +64,21 @@ __version__ = '0.2.2'
     help='Append a string to the filename.'
 )
 @click.option(
-    '--ignore-orientation', 'orientation',
+    '--keep-orientation', 'orientation',
     is_flag=True,
-    help='Include this flag to ignore the original image orientation. I.e. if '
-         '--size is landscape all portrait images will be cropped as landscape.'
+    help='Include this flag to keep the original image orientation. I.e. if '
+         '--size is landscape all portrait images will be resized as portrait, '
+         'and all landscape will be resized as landscape. If this parameter is '
+         'not included portrait images will become landscape, and vice versa.'
+)
+@click.option(
+    '--keep-aspect', 'aspect',
+    is_flag=True,
+    help='Include this flag to keep the original image aspect ratio. If this '
+         'parameter is included the image will be scaled but the aspect '
+         'ratio will be retained. This should be used with --keep-orientation '
+         'otherwise the aspect ratio may be scaled as landscape when the '
+         'original is portrait.'
 )
 @click.option(
     '-m', '--keep-metadata', 'metadata',
@@ -108,12 +119,12 @@ __version__ = '0.2.2'
 #     help='Specify how Cruncher should handle errors.'
 # )
 def cli(image, directory, output, file_format, quality, size, append,
-        metadata, orientation, nversions, recursive, config, version):
+        orientation, aspect, metadata, nversions, recursive, config, version):
     """
-    Cruncher 0.2.2
+    Cruncher 0.3.0
 
-    This is a simple CLI image optimization wrapper for the Python Image
-    Library fork Pillow. Cruncher takes images and scales them to
+    This is a simple yet powerful CLI image optimization wrapper for the
+    Python Image Library fork Pillow. Cruncher takes images and scales them to
     the specified size and quality.
     """
     if version is not None:
@@ -121,8 +132,8 @@ def cli(image, directory, output, file_format, quality, size, append,
         return
 
     cruncher = CrunchHandler(image=image, directory=directory, output=output, file_format=file_format,
-                             quality=quality, size=size, append=append, metadata=metadata,
-                             orientation=orientation, nversions=nversions, recursive=recursive,
+                             quality=quality, size=size, append=append,  orientation=orientation,
+                             metadata=metadata, aspect=aspect, nversions=nversions, recursive=recursive,
                              config=config)
     cruncher.run_cruncher()
 

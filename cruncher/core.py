@@ -26,7 +26,7 @@ ERROR_HANDLING = ["strict", "errors", "warnings", "silent"]
 class CrunchHandler:
 
     def __init__(self, image, directory, output, file_format, quality, size,
-                 append, metadata, orientation, nversions, recursive, config):
+                 append, orientation, aspect, metadata, nversions, recursive, config):
         self.image = image
         self.directory = directory
         self.output = output
@@ -34,9 +34,10 @@ class CrunchHandler:
         self.quality = quality
         self.size = size
         self.append = append
+        self.orientation = orientation
+        self.aspect = aspect
         self.metadata = metadata
         self.settings = {}
-        self.orientation = orientation
         self.nversions = nversions
         self.recursive = recursive
         self.versions = []
@@ -76,7 +77,8 @@ class CrunchHandler:
                     'height': size[1],
                     'quality': click.prompt(f'Quality',  type=click.IntRange(1, 100, clamp=True), default=80),
                     'append': click.prompt(f'Append filename',  type=str, default='', show_default=False),
-                    'orientation': click.prompt(f'Ignore orientation', type=bool, default=False),
+                    'aspect': click.prompt(f'Keep aspect', type=bool, default=False),
+                    'orientation': click.prompt(f'Keep orientation', type=bool, default=False),
                     'metadata': click.prompt(f'Keep Metadata', type=bool, default=False),
                 })
                 i += 1
@@ -94,6 +96,7 @@ class CrunchHandler:
                 'height': self.parse_size(self.size)[1],
                 'quality': self.quality,
                 'append': self.append,
+                'aspect': self.aspect,
                 'orientation': self.orientation,
                 'metadata': self.metadata,
                 'subsampling': -1
@@ -163,6 +166,7 @@ class CrunchHandler:
                 'height': self.get_config(version, 'height'),
                 'append': self.get_config(version, 'append'),
                 'orientation': self.get_config(version, 'keep_orientation', False),
+                'aspect': self.get_config(version, 'keep_aspect', False),
                 'metadata': self.get_config(version, 'keep_metadata', False),
                 'subsampling': self.get_config(version, 'subsampling', None),
                 'icc_conversion': self.get_config(version, 'icc_conversion', None)

@@ -71,7 +71,7 @@ class CruncherBase:
         if not version['append']:
             version['append'] = ''
         filename = filename.split('.')
-        del(filename[-1])
+        del (filename[-1])
         filename = '.'.join(filename)
         return f"{filename}{version['append']}.{self.format}"
 
@@ -88,18 +88,25 @@ class CruncherBase:
         if size == (None, None):
             return image
 
-        old_aspect = image.width / image.height
-        new_aspect = size[0] / size[1]
+        old_orientation = image.width / image.height
+        new_orientation = size[0] / size[1]
 
-        if version['orientation'] and (old_aspect <= 1 < new_aspect or old_aspect >= 1 > new_aspect):
+        if (version['orientation']
+                and (old_orientation <= 1 < new_orientation or old_orientation >= 1 > new_orientation)):
             # if one is horizontal and the other vertical flip the orientation
             size = (size[1], size[0])
-            new_aspect = size[0] / size[1]
+            new_orientation = size[0] / size[1]
 
         if size == (image.width, image.height):
-            return image
+            self.image = image
+            return
 
-        if new_aspect < old_aspect:
+        if version['aspect']:
+            image.thumbnail(size, Image.LANCZOS)
+            self.image = image
+            return
+
+        if new_orientation < old_orientation:
             v_width = image.width - (image.height / size[1] * size[0])
             v_height = image.height
             left = v_width / 2

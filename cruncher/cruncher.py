@@ -9,10 +9,11 @@
 import os
 
 # Package Imports
-from PIL import Image, ImageCms
+from PIL import Image, ImageCms, ImageEnhance
 import click
 
 # Local Imports
+from .utils import calculate_temperature_change
 
 
 class CruncherBase:
@@ -39,9 +40,11 @@ class CruncherBase:
         if self.skip_image:
             return
 
-        # Run conversions and resizing
-        self.convert_icc_profile()
+        # Run conversions, corrections and resizing
         self.resize()
+        self.convert_rgb()
+        self.convert_icc_profile()
+        self.enhance()
 
         if self.skip_image:
             return
@@ -141,6 +144,9 @@ class CruncherBase:
             return 0
         return round(raw_sampling)
 
+    def convert_rgb(self):
+        self.image = self.image.convert('RGB')
+
     def convert_icc_profile(self):
         """
         Converts image colors based on the input and output ICC profiles.
@@ -162,6 +168,42 @@ class CruncherBase:
         except ImageCms.PyCMSError as e:
             self.messages.append(f'Image ICC profile conversion failed: {self.image_path}')
             self.skip_image = True
+
+    def enhance(self):
+        if not self.version.get('enhance'):
+            return
+
+        # click.echo(self.image_path)
+
+        enhancements = self.version.get('enhance')
+        for enhancement, value in enhancements.items():
+            if enhancement == 'brightness' and value != 1:
+                self.image = ImageEnhance.Brightness(self.image).enhance(value / 100 + 1)
+            if enhancement == 'color' and value != 1:
+                self.image = ImageEnhance.Color(self.image).enhance(value / 100 + 1)
+            if enhancement == 'contrast' and value != 1:
+                self.image = ImageEnhance.Contrast(self.image).enhance(value / 100 + 1)
+            if enhancement == 'sharpness' and value != 1:
+                self.image = ImageEnhance.Sharpness(self.image).enhance(value / 100 + 1)
+            if enhancement == 'temperature':
+                self.image = self.temperature(value)
+
+    def temperature(self, temperature):
+        # import cv2
+        # import numpy as np
+        # img = np.array(self.image)
+        # filt = cv2.transform( img, np.matrix([[0.390, 0.769, 0.189],
+        #                                       [0.349, 0.686, 0.168],
+        #                                       [0.272, 0.534, 0.131]
+        #                                       ]))
+        # filt[np.where(filt > 255)] = 255
+        # return Image.fromarray(filt)
+
+        r, g, b = calculate_temperature_change(temperature)
+        matrix = (r / 255.0, 0.0, 0.0, 0.0,
+                  0.0, g / 255.0, 0.0, 0.0,
+                  0.0, 0.0, b / 255.0, 0.0)
+        return self.image.convert('RGB', matrix)
 
     def get_transparency(self, default=None):
         transparency = default

@@ -162,6 +162,13 @@ class CrunchHandler:
         self.versions = []
         versions = configs.get('versions')
         for version in versions:
+            raw_enhance = self.get_config(version, 'enhance', None)
+            enhance = {}
+            if raw_enhance is not None:
+                for prop in raw_enhance.keys():
+                    if prop in ['brightness', 'color', 'contrast', 'sharpness', 'temperature']:
+                        enhance[prop] = raw_enhance[prop]
+            # click.echo(enhance)
             self.versions.append({
                 'file_format': self.get_config(version, 'file_format', 'jpg'),
                 'quality': self.get_config(version, 'quality', 80),
@@ -172,7 +179,8 @@ class CrunchHandler:
                 'aspect': self.get_config(version, 'keep_aspect', False),
                 'metadata': self.get_config(version, 'keep_metadata', False),
                 'subsampling': self.get_config(version, 'subsampling', None),
-                'icc_conversion': self.get_config(version, 'icc_conversion', None)
+                'icc_conversion': self.get_config(version, 'icc_conversion', None),
+                'enhance': enhance
             })
         self.nversions = len(versions)
         self.mode = self.check_mode()

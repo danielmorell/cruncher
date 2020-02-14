@@ -84,9 +84,12 @@ class CrunchHandler:
                 i += 1
 
         elif self.config:
-            with open(self.config) as json_config:
-                configs = json.load(json_config)
-                self.parse_json_configs(configs)
+            try:
+                with open(self.config) as json_config:
+                    configs = json.load(json_config)
+                    self.parse_json_configs(configs)
+            except FileNotFoundError:
+                click.echo(f'Cruncher could not find the config file. Please make sure the path is correct.'),
 
         else:
             self.versions.append({

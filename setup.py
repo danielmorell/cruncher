@@ -33,8 +33,8 @@ setup(
     py_modules=['cruncher'],
     packages=['cruncher'],
     install_requires=[
-        'click',
-        'pillow',
+        'click==7.1.*',
+        'pillow==7.1.*',
     ],
     include_package_data=True,
     python_requires=">=3.6",

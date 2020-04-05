@@ -49,6 +49,6 @@ Please read the documentation for more details about these options and the other
 
 ## Contributors
 
-[@danmorell](https://github.com/danmorell)
+[@danmorell](https://github.com/danielmorell)
 
 Copyright © 2019 [Daniel Morell](https://www.danielmorell.com/)

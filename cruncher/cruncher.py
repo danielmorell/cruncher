@@ -170,10 +170,12 @@ class CruncherBase:
             self.skip_image = True
 
     def enhance(self):
+        """
+        This method enhances the image based on the settings in the JSON `enhance`
+        object. All enhance properties can be values between -100 and 100.
+        """
         if not self.version.get('enhance'):
             return
-
-        # click.echo(self.image_path)
 
         enhancements = self.version.get('enhance')
         for enhancement, value in enhancements.items():
@@ -189,16 +191,11 @@ class CruncherBase:
                 self.image = self.temperature(value)
 
     def temperature(self, temperature):
-        # import cv2
-        # import numpy as np
-        # img = np.array(self.image)
-        # filt = cv2.transform( img, np.matrix([[0.390, 0.769, 0.189],
-        #                                       [0.349, 0.686, 0.168],
-        #                                       [0.272, 0.534, 0.131]
-        #                                       ]))
-        # filt[np.where(filt > 255)] = 255
-        # return Image.fromarray(filt)
-
+        """
+        Adjust the image temperature on a scale from -100 to 100.
+        :param temperature: int
+        :return: Image
+        """
         r, g, b = calculate_temperature_change(temperature)
         matrix = (r / 255.0, 0.0, 0.0, 0.0,
                   0.0, g / 255.0, 0.0, 0.0,

@@ -36,7 +36,7 @@ def friendly_data_units(data, unit, digits=5):
     return data, unit
 
 
-def calculate_temperature_change(degree):
+def calculate_temperature_change(degree: int = 0) -> tuple:
     """
     Turns a degree in a range from -100 to 100 into a RGB color conversion.
 
@@ -44,11 +44,10 @@ def calculate_temperature_change(degree):
 
     Positive degrees heat the image (increase reds)
 
-    :param degree: Integer: The desired degree for
+    :param degree: Integer: The intended color temperature change
     """
     degree = min(100, degree) if degree >= 0 else max(-100, degree)
     red = 255 if degree > 1 else round(255 - (abs(degree) / 100 * 255))
-    # green = 255 if degree == 0 else round(255 - (abs(degree) / (200 + degree * -0.5) * 255))
     green = 255 if degree == 0 else round(255 - (abs(degree) / 100 * 255))
     blue = 255 if degree < 1 else round(255 - (abs(degree) / 100 * 255))
     return red, green, blue

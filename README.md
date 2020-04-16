@@ -2,7 +2,7 @@
 
 Cruncher is a simple but powerful command line tool that optimizes images for the web.
 
-[![Version](https://flat.badgen.net/badge/PyPI/v0.3.1)](https://pypi.org/project/cruncher/)
+[![Version](https://flat.badgen.net/badge/PyPI/v0.4.0)](https://pypi.org/project/cruncher/)
 
 ## Installing
 
@@ -49,6 +49,6 @@ Please read the documentation for more details about these options and the other
 
 ## Contributors
 
-[@danmorell](https://github.com/danielmorell)
+[@danielmorell](https://github.com/danielmorell)
 
-Copyright © 2019 [Daniel Morell](https://www.danielmorell.com/)
+Copyright © 2020 [Daniel Morell](https://www.danielmorell.com/)

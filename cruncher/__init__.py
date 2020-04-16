@@ -14,7 +14,7 @@ import click
 # Local Imports
 from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 
 @click.command()

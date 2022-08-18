@@ -1,9 +1,9 @@
 """
 :Project: Cruncher
 :Contents: cruncher.py
-:copyright: © 2019 Daniel Morell
-:license: GPL-3.0, see LICENSE for more details.
-:Author: DanielCMorell
+:copyright: © 2019-2022 Daniel Morell
+:license: MIT, see LICENSE for more details.
+:Author: Daniel Morell
 """
 # Standard Library Imports
 import os

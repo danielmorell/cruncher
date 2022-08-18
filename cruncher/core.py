@@ -1,9 +1,9 @@
 """
 :Project: Cruncher
 :Contents: core.py
-:copyright: © 2019 Daniel Morell
-:license: GPL-3.0, see LICENSE for more details.
-:Author: DanielCMorell
+:copyright: © 2019-2022 Daniel Morell
+:license: MIT, see LICENSE for more details.
+:Author: Daniel Morell
 """
 # Standard Library Imports
 import os
@@ -16,7 +16,7 @@ import click
 from .cruncher import GIFCruncher, JPEGCruncher, JPEG2000Cruncher, PNGCruncher, WebPCruncher
 from .utils import friendly_data_units
 
-SUPPORTED_FILES_EXTENSIONS = ['bmp', 'dib', 'jpg', 'jpeg', 'gif', 'tif', 'webp', 'png', 'ico', 'j2p', 'jpx']
+SUPPORTED_FILES_EXTENSIONS = ['bmp', 'dib', 'jpg', 'jpeg', 'gif', 'nef', 'tif', 'webp', 'png', 'ico', 'j2p', 'jpx']
 OUTPUT_FILE_FORMATS = ['JPEG', 'PNG']
 FUTURE_FORMATS = ['JPEG 2000', 'WebP', 'GIF']
 

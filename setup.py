@@ -1,9 +1,9 @@
 """
 :Project: Cruncher
 :Contents: setup.py
-:copyright: © 2019 Daniel Morell
-:license: GPL-3.0, see LICENSE for more details.
-:Author: DanielCMorell
+:copyright: © 2019-2022 Daniel Morell
+:license: MIT, see LICENSE for more details.
+:Author: Daniel Morell
 """
 
 import io
@@ -33,11 +33,11 @@ setup(
     py_modules=['cruncher'],
     packages=['cruncher'],
     install_requires=[
-        'click==7.1.*',
-        'pillow>=8.1.1',
+        'click==8.1.*',
+        'pillow==9.2.*',
     ],
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -45,9 +45,9 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     entry_points='''
         [console_scripts]

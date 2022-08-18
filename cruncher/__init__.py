@@ -1,9 +1,9 @@
 """
 :Project: Cruncher
 :Contents: __init__.py
-:copyright: © 2019 Daniel Morell
-:license: GPL-3.0, see LICENSE for more details.
-:Author: DanielCMorell
+:copyright: © 2019-2022 Daniel Morell
+:license: MIT, see LICENSE for more details.
+:Author: Daniel Morell
 """
 # Standard Library Imports
 import os
@@ -14,7 +14,7 @@ import click
 # Local Imports
 from .core import CrunchHandler, OUTPUT_FILE_FORMATS, ERROR_HANDLING
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 
 @click.command()
